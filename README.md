@@ -1,6 +1,6 @@
 # Making Miso Soup with ReactiveCocoa 4 and Swift 2
 
-This project was developed using Xcode 7.
+This project was developed using Xcode 7.0.
 
 ## Installing and Running on Your Mac
 
