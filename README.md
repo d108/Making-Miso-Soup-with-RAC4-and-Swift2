@@ -8,7 +8,7 @@ Clone the repository with
 
 	git clone https://github.com/dz1111/Making-Miso-Soup-with-RAC4-and-Swift2
 	
-Add the submodules using
+Add the submodule using
 
 	cd Making-Miso-Soup-with-RAC4-and-Swift2
 
