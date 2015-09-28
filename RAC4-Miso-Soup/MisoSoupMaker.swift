@@ -30,7 +30,7 @@ class MisoSoupMaker {
 
     struct Temperature {
         let boiling = 212 as Int
-        let cooled = 175 as Int
+        let cooled = 140 as Int
     }
 
     let name = "miso soup (味噌汁)"
@@ -170,9 +170,9 @@ class MisoSoupMaker {
 
                 dispatch_after(time, dispatch_get_main_queue()) {
                     if t == 10 {
-                        subscriber.sendNext(212)
+                        subscriber.sendNext(Temperature().boiling)
                     } else if t == 30 {
-                        subscriber.sendNext(175)
+                        subscriber.sendNext(Temperature().cooled)
                     } else {
                         subscriber.sendNext(nil)
                     }
