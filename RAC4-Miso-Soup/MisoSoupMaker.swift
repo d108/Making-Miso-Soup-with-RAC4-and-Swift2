@@ -72,19 +72,17 @@ class MisoSoupMaker {
         print("Watching the water.")
 
         let temp = Temperature()
-
-        temperatureSignal().deliverOnMainThread()
-        let temperature = temperatureSignal().toSignalProducer()
-
-        temperature.start( { results in
-            if results.event.value as? Int == temp.boiling {
-                print("Water is boiling.")
-                self.addIngredient(boilIsComplete: true, coolingIsComplete: false)
-            } else if results.event.value as? Int == temp.cooled {
-                print("Water has cooled.")
-                self.addIngredient(boilIsComplete: true, coolingIsComplete: true)
+        temperatureSignal().observeOn(UIScheduler()).observeNext { event in
+            if let result = event {
+                if result == temp.boiling {
+                    print("Water is boiling.")
+                    self.addIngredient(boilIsComplete: true, coolingIsComplete: false)
+                } else if result == temp.cooled {
+                    print("Water has cooled.")
+                    self.addIngredient(boilIsComplete: true, coolingIsComplete: true)
+                }
             }
-        })
+        }
     }
 
     /**
@@ -103,10 +101,9 @@ class MisoSoupMaker {
         }
 
         // Grab the next ingredient.
-        ingredientsSignal().subscribeNext{ (ingredient) in
-
+        ingredientsSignal().observeNext { ingredient in
             print("Adding ingredient \(ingredient).")
-            self.saucePan.append(ingredient as! (String))
+            self.saucePan.append(ingredient)
             print("Saucepan contains \(self.saucePan)")
 
             if !boilIsComplete && !coolingIsComplete && self.saucePan.contains("water (水)") && self.saucePan.count == 1 {
@@ -128,60 +125,48 @@ class MisoSoupMaker {
     /**
 
     Represents ingredients being added to a cooking pot.
-    - returns: RACSignal
+    - returns: Signal
 
     */
-    func ingredientsSignal() -> RACSignal
-    {
-        return RACSignal.createSignal( { (subscriber: RACSubscriber!) -> RACDisposable! in
-
-            let delay = 2.0 * Double(NSEC_PER_SEC)
-            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-
-            dispatch_after(time, dispatch_get_main_queue()) {
+    func ingredientsSignal() -> Signal<String, NoError> {
+        return Signal {sink in
+            NSTimer.schedule(delay: 2.0) { _ in
                 if self.ingredients.count > 0 {
-                    subscriber.sendNext(self.ingredients[0])
+                    sendNext(sink, self.ingredients[0])
+                    self.ingredients.removeFirst()
+                } else {
+                    print("Disposing ingredient signal.")
+                    sendCompleted(sink)
                 }
             }
-
-            return RACDisposable(block: {
-                if self.ingredients.count > 0 {
-                    print("Disposing ingredient signal.")
-                    self.ingredients.removeFirst()
-                }
-            })
-        })
+            return nil
+        }
     }
 
     /**
 
     Represents temperature that is dependent on time.
-    - returns: RACSignal
+    - returns: Signal
     
     */
-    func temperatureSignal() -> RACSignal
-    {
-        return RACSignal.createSignal( { (subscriber: RACSubscriber!) -> RACDisposable! in
-
-            for t in 0...39 {
-
-                let delay = Double(t) * 1.0 * Double(NSEC_PER_SEC)
-                let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-
-                dispatch_after(time, dispatch_get_main_queue()) {
-                    if t == 10 {
-                        subscriber.sendNext(Temperature().boiling)
-                    } else if t == 30 {
-                        subscriber.sendNext(Temperature().cooled)
-                    } else {
-                        subscriber.sendNext(nil)
-                    }
+    func temperatureSignal() -> Signal<Int?, NoError> {
+        return Signal{ sink in
+            var count = 0
+            NSTimer.schedule(repeatInterval: 1.0) { _ in
+                if count == 10 {
+                    sendNext(sink, Temperature().boiling)
+                } else if count == 30 {
+                    sendNext(sink, Temperature().cooled)
+                } else if count == 39 {
+                    print("Disposing temperature signal.")
+                    sendCompleted(sink)
+                } else {
+                    sendNext(sink, nil)
                 }
+                count++
             }
-
-            return RACDisposable(block: {
-                print("Disposing temperature signal.")
-            })
-        })
+            return nil
+            
+        }
     }
 }
