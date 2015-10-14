@@ -152,8 +152,7 @@ class MisoSoupMaker {
     func temperatureSignal() -> Signal<Int?, NoError> {
         return Signal{ sink in
             var count = 0
-            var timer = NSTimer()
-            timer = NSTimer.schedule(repeatInterval: 1.0) { _ in
+            NSTimer.schedule(repeatInterval: 1.0) { timer in
                 if count == 10 {
                     sendNext(sink, Temperature().boiling)
                 } else if count == 30 {
