@@ -129,14 +129,14 @@ class MisoSoupMaker {
 
     */
     func ingredientsSignal() -> Signal<String, NoError> {
-        return Signal {sink in
+        return Signal {observer in
             NSTimer.schedule(delay: 2.0) { _ in
                 if self.ingredients.count > 0 {
-                    sendNext(sink, self.ingredients[0])
+                    observer.sendNext(self.ingredients[0])
                     self.ingredients.removeFirst()
                 } else {
                     print("Disposing ingredient signal.")
-                    sendCompleted(sink)
+                    observer.sendCompleted()
                 }
             }
             return nil
@@ -150,19 +150,19 @@ class MisoSoupMaker {
     
     */
     func temperatureSignal() -> Signal<Int?, NoError> {
-        return Signal{ sink in
+        return Signal{ observer in
             var count = 0
             NSTimer.schedule(repeatInterval: 1.0) { timer in
                 if count == 10 {
-                    sendNext(sink, Temperature().boiling)
+                    observer.sendNext(Temperature().boiling)
                 } else if count == 30 {
-                    sendNext(sink, Temperature().cooled)
+                    observer.sendNext(Temperature().cooled)
                 } else if count == 39 {
                     print("Disposing temperature signal.")
-                    sendCompleted(sink)
+                    observer.sendCompleted()
                     timer.invalidate()
                 } else {
-                    sendNext(sink, nil)
+                    observer.sendNext(nil)
                 }
                 count++
             }
