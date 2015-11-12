@@ -1,6 +1,6 @@
 # Making Miso Soup with ReactiveCocoa 4 and Swift 2
 
-This project was developed using Xcode 7.0.
+This project was developed using Xcode 7.1.1.
 
 ## Installing and Running on Your Mac
 
@@ -20,7 +20,7 @@ Add the submodule using
 	
 	./script/bootstrap
 	
-Add the OS X embeddable binaries under the general tab of the target.
+Add the OS X embeddable binaries under the General tab of the target in Xcode.
 
 * `ReactiveCocoa.framework`
 * `Result.framework`
