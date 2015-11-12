@@ -125,11 +125,12 @@ class MisoSoupMaker {
     /**
 
     Represents ingredients being added to a cooking pot.
+
     - returns: Signal
 
     */
     func ingredientsSignal() -> Signal<String, NoError> {
-        return Signal {observer in
+        return Signal { observer in
             NSTimer.schedule(delay: 2.0) { _ in
                 if self.ingredients.count > 0 {
                     observer.sendNext(self.ingredients[0])
@@ -146,11 +147,12 @@ class MisoSoupMaker {
     /**
 
     Represents temperature that is dependent on time.
+
     - returns: Signal
     
     */
     func temperatureSignal() -> Signal<Int?, NoError> {
-        return Signal{ observer in
+        return Signal { observer in
             var count = 0
             NSTimer.schedule(repeatInterval: 1.0) { timer in
                 if count == 10 {
@@ -167,7 +169,6 @@ class MisoSoupMaker {
                 count++
             }
             return nil
-            
         }
     }
 }

@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import ReactiveCocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
